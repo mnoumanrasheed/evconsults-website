@@ -84,6 +84,11 @@ export const metadata = {
   verification: {
     google: 'YOUR_GOOGLE_VERIFICATION_CODE',
   },
+  icons: {
+    icon: '/logo.png',
+    shortcut: '/logo.png',
+    apple: '/logo.png',
+  },
 };
 
 const jsonLd = {
@@ -149,20 +154,22 @@ const jsonLd = {
   ],
 };
 
+import LayoutWrapper from '@/components/LayoutWrapper';
+
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${inter.variable} ${poppins.variable}`}>
       <head>
         <Script id="json-ld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       </head>
-      <body className={inter.className} style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-        <PageLoader />
-        <Navbar />
-        <main style={{ paddingTop: '74px', flex: '1 0 auto' }}>
+      <body className={inter.className}>
+        <LayoutWrapper
+          navbar={<Navbar />}
+          footer={<Footer />}
+          whatsapp={<WhatsAppFloat />}
+        >
           {children}
-        </main>
-        <Footer />
-        <WhatsAppFloat />
+        </LayoutWrapper>
       </body>
     </html>
   );

@@ -1,7 +1,29 @@
 import Link from 'next/link';
 import { Zap, Mail, Phone } from 'lucide-react';
 
-export default function Footer() {
+import prisma from '@/lib/prisma';
+
+export default async function Footer() {
+  let settingsRecords = [];
+  try {
+    settingsRecords = await prisma.globalSetting.findMany({
+      where: { key: { in: ['contact', 'footer'] } }
+    });
+  } catch (err) {
+    console.warn('[Footer] database fetch failed, using fallback defaults.');
+  }
+
+  const settings = {};
+  settingsRecords.forEach(rec => {
+    settings[rec.key] = rec.value || {};
+  });
+
+  const email = settings.contact?.email || 'alviaatif@hotmail.com';
+  const phone1 = settings.contact?.phone1 || '0322 5131504';
+  const phone2 = settings.contact?.phone2 || '0332 8271005';
+  const tagline = settings.footer?.tagline || 'The leading advisory platform for electric vehicle infrastructure in Pakistan. We provide end-to-end consultancy for feasibility, licensing, and implementation.';
+  const copyright = settings.footer?.copyright || 'EVConsults';
+
   return (
     <footer style={{ backgroundColor: '#020813', color: '#ffffff', paddingTop: '3rem', paddingBottom: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
       <div className="container">
@@ -16,7 +38,7 @@ export default function Footer() {
               EVConsults
             </Link>
             <p style={{ color: 'rgba(255,255,255,0.6)', lineHeight: '1.8', marginBottom: '1.5rem', fontSize: '0.95rem' }}>
-              The leading advisory platform for electric vehicle infrastructure in Pakistan. We provide end-to-end consultancy for feasibility, licensing, and implementation.
+              {tagline}
             </p>
           </div>
 
@@ -52,7 +74,7 @@ export default function Footer() {
                 </div>
                 <div>
                   <span style={{ display: 'block', color: 'rgba(255,255,255,0.4)', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.2rem' }}>Email Support</span>
-                  <a href="mailto:alviaatif@hotmail.com" style={{ color: 'white', fontWeight: '500', fontSize: '0.95rem', transition: 'color 0.3s', textDecoration: 'none', wordBreak: 'break-all' }}>alviaatif@hotmail.com</a>
+                  <a href={`mailto:${email}`} style={{ color: 'white', fontWeight: '500', fontSize: '0.95rem', transition: 'color 0.3s', textDecoration: 'none', wordBreak: 'break-all' }}>{email}</a>
                 </div>
               </div>
               
@@ -62,8 +84,8 @@ export default function Footer() {
                 </div>
                 <div>
                   <span style={{ display: 'block', color: 'rgba(255,255,255,0.4)', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.2rem' }}>Call for Consultation</span>
-                  <a href="tel:03225131504" style={{ display: 'block', color: 'white', fontWeight: '500', fontSize: '0.95rem', transition: 'color 0.3s', marginBottom: '0.4rem', textDecoration: 'none' }}>0322 5131504</a>
-                  <a href="tel:03328271005" style={{ display: 'block', color: 'white', fontWeight: '500', fontSize: '0.95rem', transition: 'color 0.3s', textDecoration: 'none' }}>0332 8271005</a>
+                  <a href={`tel:${phone1.replace(/\s+/g, '')}`} style={{ display: 'block', color: 'white', fontWeight: '500', fontSize: '0.95rem', transition: 'color 0.3s', marginBottom: '0.4rem', textDecoration: 'none' }}>{phone1}</a>
+                  <a href={`tel:${phone2.replace(/\s+/g, '')}`} style={{ display: 'block', color: 'white', fontWeight: '500', fontSize: '0.95rem', transition: 'color 0.3s', textDecoration: 'none' }}>{phone2}</a>
                 </div>
               </div>
             </div>
@@ -73,7 +95,7 @@ export default function Footer() {
 
         {/* Copyright */}
         <div className="footer-copyright-row" style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '2rem', marginTop: '1rem' }}>
-          <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem', marginBottom: 0 }}>&copy; {new Date().getFullYear()} EVConsults. All rights reserved.</p>
+          <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem', marginBottom: 0 }}>&copy; {new Date().getFullYear()} {copyright}. All rights reserved.</p>
           <div style={{ display: 'flex', gap: '1.5rem' }}>
             <Link href="#" style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem', transition: 'color 0.3s', textDecoration: 'none' }}>Privacy Policy</Link>
             <Link href="#" style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem', transition: 'color 0.3s', textDecoration: 'none' }}>Terms &amp; Conditions</Link>
